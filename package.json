@@ -3,9 +3,7 @@
   "version": "1.0.0",
   "description": "AssetGen - A tool for generating visual assets from text descriptions",
   "main": "src/index.js",
-  "bin": {
-    "assetgen": "./src/cli.js"
-  },
+  "bin": "./index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/index.js",
