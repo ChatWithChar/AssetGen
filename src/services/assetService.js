@@ -53,19 +53,33 @@ class AssetService {
    */
   async generateImage({ query, format, style, api_key, provider, transparent }) {
     try {
-      // In a real implementation, this would call an external API like OpenAI's DALL-E
-      // For now, we'll simulate the API call and return a placeholder
-
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
       // Generate a unique filename
       const filename = this.generateFilename(query, format);
       const filePath = path.join(config.assetStorage.path, filename);
 
-      // For demonstration, we'll create a placeholder image
-      // In a real implementation, this would save the image from the API response
-      await this.createPlaceholderImage(filePath, transparent);
+      // Call the appropriate API based on the provider
+      let imageData;
+
+      if (provider === 'openai') {
+        console.log(`Generating image with OpenAI for query: "${query}"`);
+        const response = await this.callOpenAIImageAPI(query, api_key, transparent);
+
+        if (response && response.data && response.data.length > 0) {
+          // Download the image from the URL
+          const imageUrl = response.data[0].url;
+          console.log(`Downloading image from: ${imageUrl}`);
+          imageData = await this.downloadImage(imageUrl);
+        } else {
+          throw new Error('No image data returned from OpenAI API');
+        }
+      } else {
+        // For other providers, use placeholder for now
+        console.log(`Using placeholder for provider: ${provider}`);
+        imageData = this.getPlaceholderImageData(transparent);
+      }
+
+      // Save the image to disk
+      await this.saveImageToDisk(filePath, imageData);
 
       // Return metadata about the generated image
       return {
@@ -107,12 +121,27 @@ class AssetService {
   }
 
   /**
-   * Create a placeholder image for demonstration purposes
-   * @param {string} filePath - Path to save the image
+   * Get placeholder image data
    * @param {boolean} transparent - Whether the image should have transparency
+   * @returns {Buffer} - Image data as a buffer
+   */
+  getPlaceholderImageData(transparent = true) {
+    if (transparent) {
+      // Create a simple 1x1 pixel transparent PNG
+      return Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', 'base64');
+    } else {
+      // Create a simple 1x1 pixel white (non-transparent) PNG
+      return Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVQI12P4//8/AAX+Av7czFnnAAAAAElFTkSuQmCC', 'base64');
+    }
+  }
+
+  /**
+   * Save image data to disk
+   * @param {string} filePath - Path to save the image
+   * @param {Buffer} imageData - Image data as a buffer
    * @returns {Promise<void>}
    */
-  async createPlaceholderImage(filePath, transparent = true) {
+  async saveImageToDisk(filePath, imageData) {
     try {
       // Ensure the directory exists
       const dir = path.dirname(filePath);
@@ -120,24 +149,28 @@ class AssetService {
         fs.mkdirSync(dir, { recursive: true });
       }
 
-      // In a real implementation, this would download the image from the API
-      // and save it locally. For now, we'll create a simple placeholder image.
+      fs.writeFileSync(filePath, imageData);
 
-      let pixelData;
-      if (transparent) {
-        // Create a simple 1x1 pixel transparent PNG
-        pixelData = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', 'base64');
-      } else {
-        // Create a simple 1x1 pixel white (non-transparent) PNG
-        pixelData = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVQI12P4//8/AAX+Av7czFnnAAAAAElFTkSuQmCC', 'base64');
-      }
-
-      fs.writeFileSync(filePath, pixelData);
-
-      console.log(`Placeholder image created at: ${filePath} (transparent: ${transparent})`);
+      console.log(`Image saved at: ${filePath}`);
     } catch (error) {
-      console.error('Error creating placeholder image:', error);
-      throw new Error(`Failed to create placeholder image: ${error.message}`);
+      console.error('Error saving image to disk:', error);
+      throw new Error(`Failed to save image: ${error.message}`);
+    }
+  }
+
+  /**
+   * Download an image from a URL
+   * @param {string} url - URL of the image to download
+   * @returns {Promise<Buffer>} - Image data as a buffer
+   */
+  async downloadImage(url) {
+    try {
+      console.log(`Downloading image from URL: ${url}`);
+      const response = await axios.get(url, { responseType: 'arraybuffer' });
+      return Buffer.from(response.data, 'binary');
+    } catch (error) {
+      console.error('Error downloading image:', error);
+      throw new Error(`Failed to download image: ${error.message}`);
     }
   }
 
@@ -150,18 +183,19 @@ class AssetService {
    */
   async callOpenAIImageAPI(prompt, api_key, transparent = true) {
     try {
-      // In a real implementation, you would adjust the prompt based on transparency
-      // For example, adding "with transparent background" to the prompt if transparent is true
+      // Adjust the prompt based on transparency
       const adjustedPrompt = transparent
         ? `${prompt} with transparent background`
         : prompt;
+
+      console.log(`Calling OpenAI API with prompt: "${adjustedPrompt}"`);
 
       const response = await axios.post(
         'https://api.openai.com/v1/images/generations',
         {
           prompt: adjustedPrompt,
           n: 1,
-          size: '256x256',
+          size: '1024x1024',
           response_format: 'url',
         },
         {
@@ -172,6 +206,7 @@ class AssetService {
         }
       );
 
+      console.log('OpenAI API response received');
       return response.data;
     } catch (error) {
       console.error('Error calling OpenAI API:', error.response?.data || error.message);
