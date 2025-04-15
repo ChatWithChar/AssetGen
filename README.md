@@ -37,7 +37,28 @@ You can install AssetGen directly from GitHub:
 npx -y github:ChatWithChar/AssetGen --api-key=YOUR_API_KEY
 ```
 
-### Option 3: Manual Installation
+### Option 3: Clone and Install
+
+If you encounter issues with npx, you can clone the repository and install manually:
+
+```bash
+# Clone the repository
+git clone https://github.com/ChatWithChar/AssetGen.git
+
+# Navigate to the directory
+cd AssetGen
+
+# Install dependencies
+npm install
+
+# Set up with your API key
+node index.js --api-key=YOUR_API_KEY
+
+# Start the server
+npm start
+```
+
+### Option 4: Manual Installation
 
 1. Clone the repository
 2. Install dependencies:
