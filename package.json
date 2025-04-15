@@ -12,16 +12,16 @@
     "dev": "nodemon src/index.js"
   },
   "keywords": ["asset", "generation", "image", "ai", "openai", "dall-e", "stability", "replicate"],
-  "author": "Your Name",
+  "author": "ChatWithChar",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/assetgen.git"
+    "url": "https://github.com/ChatWithChar/AssetGen.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/assetgen/issues"
+    "url": "https://github.com/ChatWithChar/AssetGen/issues"
   },
-  "homepage": "https://github.com/yourusername/assetgen#readme",
+  "homepage": "https://github.com/ChatWithChar/AssetGen#readme",
   "type": "commonjs",
   "dependencies": {
     "axios": "^1.8.4",

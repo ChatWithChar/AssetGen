@@ -33,8 +33,8 @@ npx -y assetgen --api-key=YOUR_API_KEY --storage-path=./assets
 You can install AssetGen directly from GitHub:
 
 ```bash
-# Replace 'yourusername' with the actual GitHub username
-npx -y github:yourusername/assetgen --api-key=YOUR_API_KEY
+# Install directly from GitHub
+npx -y github:ChatWithChar/AssetGen --api-key=YOUR_API_KEY
 ```
 
 ### Option 3: Manual Installation
