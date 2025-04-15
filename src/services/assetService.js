@@ -184,8 +184,9 @@ class AssetService {
   async callOpenAIImageAPI(prompt, api_key, transparent = true) {
     try {
       // Adjust the prompt based on transparency
+      // DALL-E 2 can generate images with transparency when properly prompted
       const adjustedPrompt = transparent
-        ? `${prompt} with transparent background`
+        ? `${prompt} with transparent background, isolated object, no background, alpha channel transparency, png format`
         : prompt;
 
       console.log(`Calling OpenAI API with prompt: "${adjustedPrompt}"`);
@@ -195,8 +196,9 @@ class AssetService {
         {
           prompt: adjustedPrompt,
           n: 1,
-          size: '1024x1024',
+          size: '512x512',  // DALL-E 2 supports 256x256, 512x512, or 1024x1024
           response_format: 'url',
+          model: 'dall-e-2',  // Specify DALL-E 2 which is more cost-effective
         },
         {
           headers: {

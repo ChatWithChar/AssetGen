@@ -8,6 +8,7 @@ AssetGen serves as an intermediary between AI agents and asset generation APIs. 
 - Save generated assets locally in the project
 - Support for different asset types and styles
 - Option for transparent or non-transparent images
+- Cost-effective image generation using DALL-E 2
 - Comprehensive error handling
 - Rate limiting to prevent abuse
 
@@ -82,6 +83,14 @@ npm run dev
 ```
 
 ## API Documentation
+
+### Cost Information
+
+AssetGen uses DALL-E 2 for image generation, which is more cost-effective than DALL-E 3:
+
+- DALL-E 2 pricing: Approximately $0.02 per image at 512x512 resolution
+- Images are generated with transparency when requested
+- The tool downloads and saves images locally to avoid repeated API calls
 
 ### Generate Asset
 
